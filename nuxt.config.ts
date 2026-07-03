@@ -51,7 +51,15 @@ export default defineNuxtConfig({
       description: 'Ứng dụng quản lý tài chính cá nhân đơn giản và hiệu quả',
       theme_color: '#0f172a',
       background_color: '#f0f2f5',
+      start_url: '/',
+      display: 'standalone',
       icons: [
+        {
+          src: '/app_icon.png',
+          sizes: '192x192',
+          type: 'image/png',
+          purpose: 'any'
+        },
         {
           src: '/app_icon.png',
           sizes: '512x512',
