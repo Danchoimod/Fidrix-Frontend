@@ -10,15 +10,15 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <aside class="w-64 bg-slate-900 text-slate-100 flex flex-col h-screen fixed left-0 top-0 border-r border-slate-800">
+  <aside class="w-64 bg-white text-slate-950 flex flex-col h-screen fixed left-0 top-0 border-r border-slate-200">
     <!-- Brand / Logo -->
-    <div class="p-6 border-b border-slate-800 flex items-center gap-3">
+    <div class="p-6 border-b border-slate-100 flex items-center gap-3">
       <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-[#667eea] to-[#764ba2] flex items-center justify-center text-white font-extrabold text-lg">
         F
       </div>
       <div>
-        <h1 class="text-lg font-bold text-white tracking-tight">Fidrix</h1>
-        <span class="text-[10px] text-slate-400 font-semibold tracking-wider uppercase">Quản lý tài chính</span>
+        <h1 class="text-lg font-bold text-slate-900 tracking-tight">Fidrix</h1>
+        <span class="text-[10px] text-gray-400 font-semibold tracking-wider uppercase">Quản lý tài chính</span>
       </div>
     </div>
 
@@ -28,7 +28,7 @@ const emit = defineEmits<{
       <button 
         @click="emit('changeTab', 'home')"
         class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition"
-        :class="props.activeTab === 'home' ? 'bg-white/10 text-white font-bold' : 'text-slate-400 hover:text-white hover:bg-white/5'"
+        :class="props.activeTab === 'home' ? 'bg-slate-100 text-slate-900 font-bold' : 'text-gray-500 hover:text-slate-900 hover:bg-slate-50'"
       >
         <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
           <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
@@ -41,7 +41,7 @@ const emit = defineEmits<{
       <button 
         @click="emit('changeTab', 'ledger')"
         class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition"
-        :class="props.activeTab === 'ledger' ? 'bg-white/10 text-white font-bold' : 'text-slate-400 hover:text-white hover:bg-white/5'"
+        :class="props.activeTab === 'ledger' ? 'bg-slate-100 text-slate-900 font-bold' : 'text-gray-500 hover:text-slate-900 hover:bg-slate-50'"
       >
         <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
           <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
@@ -49,27 +49,27 @@ const emit = defineEmits<{
           <line x1="16" y1="13" x2="8" y2="13" />
           <line x1="16" y1="17" x2="8" y2="17" />
         </svg>
-        Sổ thu chi (Ledger)
+        Sổ thu chi
       </button>
 
       <!-- Debt -->
       <button 
         @click="emit('changeTab', 'debt')"
         class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition"
-        :class="props.activeTab === 'debt' ? 'bg-white/10 text-white font-bold' : 'text-slate-400 hover:text-white hover:bg-white/5'"
+        :class="props.activeTab === 'debt' ? 'bg-slate-100 text-slate-900 font-bold' : 'text-gray-500 hover:text-slate-900 hover:bg-slate-50'"
       >
         <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
           <rect x="1" y="4" width="22" height="16" rx="2" />
           <line x1="1" y1="10" x2="23" y2="10" />
         </svg>
-        Quản lý công nợ (Debt)
+        Quản lý công nợ
       </button>
 
       <!-- Reports -->
       <button 
         @click="emit('changeTab', 'reports')"
         class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition"
-        :class="props.activeTab === 'reports' ? 'bg-white/10 text-white font-bold' : 'text-slate-400 hover:text-white hover:bg-white/5'"
+        :class="props.activeTab === 'reports' ? 'bg-slate-100 text-slate-900 font-bold' : 'text-gray-500 hover:text-slate-900 hover:bg-slate-50'"
       >
         <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
           <rect x="3" y="3" width="18" height="18" rx="2" />
@@ -80,10 +80,10 @@ const emit = defineEmits<{
     </nav>
 
     <!-- Logout / Footer -->
-    <div class="p-4 border-t border-slate-800">
+    <div class="p-4 border-t border-slate-100">
       <button 
         @click="emit('logout')"
-        class="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-xs font-bold text-red-400 hover:text-red-300 hover:bg-red-500/10 transition"
+        class="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-xs font-bold text-red-500 hover:text-red-600 hover:bg-red-50 transition"
       >
         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
           <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
