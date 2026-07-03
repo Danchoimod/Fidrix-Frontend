@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Quản Lý Tài Chính</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --bg: #f0f2f5;
+    --card: #ffffff;
+    --text-primary: #1a1a2e;
+    --text-secondary: #6b7280;
+    --text-muted: #9ca3af;
+    --green: #10b981;
+    --green-light: #d1fae5;
+    --green-bg: #ecfdf5;
+    --red: #ef4444;
+    --red-light: #fee2e2;
+    --red-bg: #fef2f2;
+    --orange: #f97316;
+    --orange-light: #ffedd5;
+    --blue-light: #e0e7ff;
+    --blue: #6366f1;
+    --dark: #0f172a;
+    --accent: #10b981;
+    --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-md: 0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.05);
+  }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    display: flex;
+    justify-content: center;
+    min-height: 100vh;
+  }
+  .phone {
+    width: 100%;
+    max-width: 420px;
+    min-height: 100vh;
+    background: var(--bg);
+    position: relative;
+    overflow-x: hidden;
+  }
+  .header {
+    background: var(--bg);
+    padding: 16px 20px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .header-left { display: flex; align-items: center; gap: 12px; }
+  .avatar {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-weight: 700; font-size: 16px;
+  }
+  .header-greeting small { font-size: 11px; color: var(--text-secondary); display: block; font-weight: 500; letter-spacing: 0.02em; }
+  .header-greeting h2 { font-size: 20px; font-weight: 700; color: var(--text-primary); line-height: 1.2; }
+  .header-actions { display: flex; gap: 8px; }
+  .icon-btn {
+    width: 38px; height: 38px; border-radius: 12px; background: var(--card);
+    border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    box-shadow: var(--shadow); position: relative; transition: transform 0.1s;
+  }
+  .icon-btn:active { transform: scale(0.95); }
+  .icon-btn svg { width: 18px; height: 18px; color: var(--text-primary); }
+  .badge {
+    position: absolute; top: 6px; right: 6px; width: 8px; height: 8px;
+    background: var(--red); border-radius: 50%; border: 2px solid var(--bg);
+  }
+
+  /* PAGE SYSTEM */
+  .page { display: none; padding: 0 16px 100px; flex-direction: column; gap: 12px; }
+  .page.active { display: flex; }
+
+  /* BALANCE CARD */
+  .balance-card {
+    background: var(--dark); border-radius: 20px; padding: 24px 22px 22px;
+    color: white; position: relative; overflow: hidden;
+  }
+  .balance-card::before {
+    content: ''; position: absolute; top: -40px; right: -40px;
+    width: 160px; height: 160px; border-radius: 50%; background: rgba(255,255,255,0.04);
+  }
+  .balance-label { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; color: rgba(255,255,255,0.55); text-transform: uppercase; margin-bottom: 8px; }
+  .balance-amount { font-size: 34px; font-weight: 800; letter-spacing: -0.02em; line-height: 1; margin-bottom: 20px; }
+  .savings-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+  .savings-label { font-size: 12px; color: rgba(255,255,255,0.6); }
+  .savings-pct { font-size: 13px; font-weight: 700; color: var(--accent); }
+  .progress-bar { height: 6px; background: rgba(255,255,255,0.12); border-radius: 99px; overflow: hidden; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), #34d399); border-radius: 99px; transition: width 1s cubic-bezier(0.4,0,0.2,1); }
+
+  /* STATS GRID */
+  .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .stat-card { background: var(--card); border-radius: 16px; padding: 16px; box-shadow: var(--shadow); }
+  .stat-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .stat-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+  .stat-icon svg { width: 18px; height: 18px; }
+  .stat-icon.income { background: var(--green-bg); color: var(--green); }
+  .stat-icon.expense { background: var(--red-bg); color: var(--red); }
+  .stat-icon.debt { background: var(--orange-light); color: var(--orange); }
+  .stat-icon.due { background: var(--blue-light); color: var(--blue); }
+  .stat-change { font-size: 11px; font-weight: 600; padding: 2px 6px; border-radius: 6px; }
+  .stat-change.up { color: var(--green); background: var(--green-light); }
+  .stat-change.down { color: var(--red); background: var(--red-light); }
+  .stat-change.warn { color: var(--orange); background: var(--orange-light); }
+  .stat-change.neutral { color: var(--blue); background: var(--blue-light); }
+  .stat-label { font-size: 12px; color: var(--text-secondary); margin-bottom: 4px; }
+  .stat-value { font-size: 22px; font-weight: 800; color: var(--text-primary); letter-spacing: -0.02em; }
+
+  /* SECTION HEADER */
+  .section-header { display: flex; align-items: center; justify-content: space-between; padding: 4px 2px; }
+  .section-title { font-size: 16px; font-weight: 700; color: var(--text-primary); }
+  .section-link { font-size: 13px; color: var(--green); font-weight: 600; cursor: pointer; }
+
+  /* PAYMENT LIST */
+  .payment-list { display: flex; flex-direction: column; gap: 8px; }
+  .payment-item {
+    background: var(--card); border-radius: 14px; padding: 14px 16px;
+    display: flex; align-items: center; gap: 12px; box-shadow: var(--shadow);
+    border-left: 4px solid transparent; transition: transform 0.15s; cursor: pointer;
+  }
+  .payment-item:hover { transform: translateX(2px); }
+  .payment-item.urgent { border-left-color: var(--red); }
+  .payment-item.normal { border-left-color: var(--green); }
+  .payment-icon { width: 40px; height: 40px; border-radius: 12px; background: var(--blue-light); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--blue); }
+  .payment-icon svg { width: 20px; height: 20px; }
+  .payment-info { flex: 1; }
+  .payment-name { font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 2px; }
+  .payment-due { font-size: 11px; color: var(--text-muted); }
+  .payment-due.urgent { color: var(--red); font-weight: 600; }
+  .payment-amount { font-size: 15px; font-weight: 700; letter-spacing: 0.02em; }
+  .payment-amount.urgent { color: var(--red); }
+  .payment-amount.normal { color: var(--green); }
+
+  /* ====== DEBT PAGE ====== */
+  .debt-summary-card {
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    border-radius: 20px; padding: 22px; color: white;
+  }
+  .debt-summary-card .label { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; color: rgba(255,255,255,0.6); text-transform: uppercase; margin-bottom: 6px; }
+  .debt-summary-card .net-amount { font-size: 30px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 4px; }
+  .debt-summary-card .net-label { font-size: 12px; color: rgba(255,255,255,0.7); margin-bottom: 16px; }
+  .debt-summary-row { display: flex; gap: 16px; }
+  .debt-summary-col { flex: 1; background: rgba(255,255,255,0.12); border-radius: 12px; padding: 10px 12px; }
+  .debt-summary-col .col-label { font-size: 10px; color: rgba(255,255,255,0.65); margin-bottom: 4px; }
+  .debt-summary-col .col-val { font-size: 16px; font-weight: 700; }
+
+  /* PEOPLE LIST */
+  .person-card {
+    background: var(--card); border-radius: 16px; padding: 14px 16px;
+    display: flex; align-items: center; gap: 12px; box-shadow: var(--shadow);
+    cursor: pointer; transition: transform 0.12s;
+  }
+  .person-card:hover { transform: translateY(-1px); box-shadow: var(--shadow-md); }
+  .person-avatar {
+    width: 44px; height: 44px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 16px; color: white; flex-shrink: 0;
+  }
+  .person-info { flex: 1; }
+  .person-name { font-size: 15px; font-weight: 600; color: var(--text-primary); }
+  .person-status { font-size: 12px; margin-top: 2px; }
+  .person-amount { font-size: 16px; font-weight: 800; }
+  .person-amount.owe { color: var(--red); }
+  .person-amount.lend { color: var(--green); }
+
+  /* SETTLE PLAN */
+  .settle-card {
+    background: var(--card); border-radius: 16px; padding: 16px; box-shadow: var(--shadow);
+  }
+  .settle-title { font-size: 13px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
+  .settle-title span { background: var(--green-bg); color: var(--green); font-size: 10px; padding: 2px 7px; border-radius: 20px; font-weight: 600; }
+  .settle-row {
+    display: flex; align-items: center; gap: 10px; padding: 10px 0;
+    border-bottom: 1px solid #f3f4f6;
+  }
+  .settle-row:last-child { border-bottom: none; padding-bottom: 0; }
+  .settle-avatar-sm {
+    width: 30px; height: 30px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; color: white; flex-shrink: 0;
+  }
+  .settle-arrow { color: var(--text-muted); font-size: 16px; flex-shrink: 0; }
+  .settle-info { flex: 1; }
+  .settle-desc { font-size: 13px; color: var(--text-primary); font-weight: 500; }
+  .settle-amount { font-size: 13px; font-weight: 700; color: var(--green); margin-top: 1px; }
+  .settle-done-btn {
+    font-size: 11px; font-weight: 600; color: var(--text-muted);
+    background: #f3f4f6; border: none; border-radius: 8px;
+    padding: 4px 10px; cursor: pointer; transition: all 0.15s; flex-shrink: 0;
+  }
+  .settle-done-btn:hover { background: var(--green-light); color: var(--green); }
+  .settle-done-btn.done { background: var(--green-light); color: var(--green); }
+
+  /* ADD PERSON FORM */
+  .add-person-form {
+    background: var(--card); border-radius: 16px; padding: 16px; box-shadow: var(--shadow);
+  }
+  .form-title { font-size: 14px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; }
+  .form-row { display: flex; gap: 8px; align-items: flex-end; }
+  .form-group { flex: 1; }
+  .form-group label { font-size: 11px; font-weight: 600; color: var(--text-secondary); display: block; margin-bottom: 5px; letter-spacing: 0.04em; text-transform: uppercase; }
+  .form-input {
+    width: 100%; padding: 10px 12px; border-radius: 10px;
+    border: 1.5px solid #e5e7eb; font-size: 14px; background: var(--bg);
+    color: var(--text-primary); outline: none; transition: border-color 0.15s;
+    font-family: inherit;
+  }
+  .form-input:focus { border-color: var(--blue); }
+  .form-input.amount-input { font-weight: 600; }
+  .type-toggle { display: flex; gap: 6px; }
+  .type-btn {
+    flex: 1; padding: 9px 0; border-radius: 10px; border: 1.5px solid #e5e7eb;
+    font-size: 12px; font-weight: 600; cursor: pointer; background: var(--bg);
+    color: var(--text-muted); transition: all 0.15s;
+  }
+  .type-btn.active-lend { background: var(--green-bg); border-color: var(--green); color: var(--green); }
+  .type-btn.active-owe { background: var(--red-bg); border-color: var(--red); color: var(--red); }
+  .add-btn {
+    padding: 10px 16px; background: var(--dark); color: white; border: none;
+    border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer;
+    transition: opacity 0.15s; white-space: nowrap;
+  }
+  .add-btn:active { opacity: 0.8; }
+
+  /* EMPTY STATE */
+  .empty-state {
+    text-align: center; padding: 32px 16px;
+    color: var(--text-muted); font-size: 14px;
+  }
+  .empty-state .icon { font-size: 40px; margin-bottom: 10px; }
+
+  /* FAB */
+  .fab {
+    position: fixed; bottom: 80px; right: calc(50% - 210px + 16px);
+    width: 52px; height: 52px; border-radius: 50%; background: var(--dark);
+    color: white; border: none; cursor: pointer; display: flex;
+    align-items: center; justify-content: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25); transition: transform 0.15s; z-index: 20;
+  }
+  .fab:active { transform: scale(0.95); }
+  .fab svg { width: 22px; height: 22px; }
+
+  /* BOTTOM NAV */
+  .bottom-nav {
+    position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 100%; max-width: 420px; background: var(--card);
+    border-top: 1px solid rgba(0,0,0,0.06); display: flex;
+    padding: 10px 0 16px; z-index: 10;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
+  }
+  .nav-item {
+    flex: 1; display: flex; flex-direction: column; align-items: center;
+    gap: 4px; cursor: pointer; padding: 4px 0; border: none; background: none;
+    color: var(--text-muted); transition: color 0.15s;
+  }
+  .nav-item svg { width: 22px; height: 22px; }
+  .nav-item span { font-size: 10px; font-weight: 600; letter-spacing: 0.02em; }
+  .nav-item.active { color: white; }
+  .nav-item.active .nav-pill {
+    background: var(--dark); border-radius: 14px; padding: 8px 20px 6px;
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+  }
+  .nav-item:not(.active):hover { color: var(--text-secondary); }
+
+  /* MODAL */
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 50;
+    display: flex; align-items: flex-end; justify-content: center;
+    opacity: 0; pointer-events: none; transition: opacity 0.25s;
+  }
+  .modal-overlay.open { opacity: 1; pointer-events: all; }
+  .modal {
+    background: var(--card); border-radius: 24px 24px 0 0;
+    padding: 20px 20px 40px; width: 100%; max-width: 420px;
+    transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+  }
+  .modal-overlay.open .modal { transform: translateY(0); }
+  .modal-handle { width: 36px; height: 4px; background: #e5e7eb; border-radius: 99px; margin: 0 auto 20px; }
+  .modal h3 { font-size: 18px; font-weight: 700; margin-bottom: 16px; color: var(--text-primary); }
+  .action-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .action-btn {
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    padding: 14px 10px; border-radius: 14px; background: var(--bg);
+    border: none; cursor: pointer; transition: transform 0.1s;
+  }
+  .action-btn:active { transform: scale(0.96); }
+  .action-btn-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; }
+  .action-btn-icon svg { width: 22px; height: 22px; }
+  .action-btn span { font-size: 12px; font-weight: 600; color: var(--text-primary); }
+
+  @media (max-width: 420px) { .fab { right: 16px; } }
+</style>
+</head>
+<body>
+<div class="phone">
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-left">
+      <div class="avatar">T</div>
+      <div class="header-greeting">
+        <small id="headerDate">Tháng 8, 2024</small>
+        <h2>Chào, Tuấn</h2>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="icon-btn">
+        <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+          <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/>
+          <line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+        </svg>
+      </button>
+      <button class="icon-btn">
+        <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+          <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+        </svg>
+        <span class="badge"></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- HOME PAGE -->
+  <div class="page active" id="page-home">
+    <div class="balance-card">
+      <div class="balance-label">Tổng số dư khả dụng</div>
+      <div class="balance-amount">50.000.000đ</div>
+      <div class="savings-row">
+        <span class="savings-label">Tiến độ tiết kiệm</span>
+        <span class="savings-pct">85%</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-header">
+          <div class="stat-icon income">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+          </div>
+          <span class="stat-change up">+12%</span>
+        </div>
+        <div class="stat-label">Thu nhập</div>
+        <div class="stat-value">15.2M</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-header">
+          <div class="stat-icon expense">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg>
+          </div>
+          <span class="stat-change down">-5%</span>
+        </div>
+        <div class="stat-label">Chi tiêu</div>
+        <div class="stat-value">8.4M</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-header">
+          <div class="stat-icon debt">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+          </div>
+          <span class="stat-change warn">800M</span>
+        </div>
+        <div class="stat-label">Tổng nợ</div>
+        <div class="stat-value">1.2B</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-header">
+          <div class="stat-icon due">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+          </div>
+          <span class="stat-change neutral">T8</span>
+        </div>
+        <div class="stat-label">Cần trả T8</div>
+        <div class="stat-value">4.5M</div>
+      </div>
+    </div>
+    <div class="section-header">
+      <span class="section-title">Thanh toán sắp tới</span>
+      <span class="section-link">Xem tất cả</span>
+    </div>
+    <div class="payment-list">
+      <div class="payment-item normal">
+        <div class="payment-icon">
+          <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><polyline points="8 21 12 17 16 21"/></svg>
+        </div>
+        <div class="payment-info">
+          <div class="payment-name">Laptop Trả Góp</div>
+          <div class="payment-due">Hạn chót: 15 Thg 08</div>
+        </div>
+        <div class="payment-amount normal">2.150.000đ</div>
+      </div>
+      <div class="payment-item urgent">
+        <div class="payment-icon" style="background:var(--red-bg);color:var(--red)">
+          <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+        </div>
+        <div class="payment-info">
+          <div class="payment-name">Thẻ Tín Dụng VIB</div>
+          <div class="payment-due urgent">Hạn chót: 12 Thg 08 (Sắp tới)</div>
+        </div>
+        <div class="payment-amount urgent">1.200.000đ</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DEBT PAGE -->
+  <div class="page" id="page-debt">
+    <!-- Summary card -->
+    <div class="debt-summary-card" id="debtSummaryCard">
+      <div class="label">Số dư ròng công nợ</div>
+      <div class="net-amount" id="netAmountDisplay">+0đ</div>
+      <div class="net-label" id="netLabelDisplay">Chưa có dữ liệu</div>
+      <div class="debt-summary-row">
+        <div class="debt-summary-col">
+          <div class="col-label">Người ta nợ tôi</div>
+          <div class="col-val" id="totalLendDisplay">0đ</div>
+        </div>
+        <div class="debt-summary-col">
+          <div class="col-label">Tôi nợ người ta</div>
+          <div class="col-val" id="totalOweDisplay">0đ</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add person form -->
+    <div class="add-person-form">
+      <div class="form-title">➕ Thêm công nợ</div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div class="form-group">
+          <label>Tên người</label>
+          <input class="form-input" id="personName" placeholder="VD: Bò, Sếp, Chanh..." autocomplete="off">
+        </div>
+        <div class="form-group">
+          <label>Loại</label>
+          <div class="type-toggle">
+            <button class="type-btn active-lend" id="btnLend" onclick="setType('lend')">📥 Họ nợ tôi</button>
+            <button class="type-btn" id="btnOwe" onclick="setType('owe')">📤 Tôi nợ họ</button>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Số tiền (k)</label>
+            <input class="form-input amount-input" id="personAmount" type="number" placeholder="VD: 3025" min="0">
+          </div>
+          <div class="form-group" style="flex:1.2">
+            <label>Ghi chú</label>
+            <input class="form-input" id="personNote" placeholder="Tùy chọn...">
+          </div>
+          <div>
+            <label style="font-size:11px;visibility:hidden;display:block;margin-bottom:5px">.</label>
+            <button class="add-btn" onclick="addPerson()">Thêm</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- People list -->
+    <div class="section-header">
+      <span class="section-title">Danh sách công nợ</span>
+      <span class="section-link" onclick="clearAll()">Xóa tất cả</span>
+    </div>
+    <div id="peopleList">
+      <div class="empty-state">
+        <div class="icon">🤝</div>
+        Chưa có công nợ nào.<br>Thêm người vào danh sách!
+      </div>
+    </div>
+
+    <!-- Settle plan -->
+    <div id="settlePlanSection" style="display:none">
+      <div class="section-header" style="margin-top:4px">
+        <span class="section-title">Kế hoạch thanh toán</span>
+        <span class="section-link" onclick="computeSettle()">Tính lại</span>
+      </div>
+      <div class="settle-card">
+        <div class="settle-title">
+          Bù trừ tối ưu <span id="settleBadge">0 giao dịch</span>
+        </div>
+        <div id="settleList"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LEDGER PAGE -->
+  <div class="page" id="page-ledger">
+    <div class="empty-state" style="padding-top:60px">
+      <div class="icon">📒</div>
+      Sổ giao dịch<br><small style="font-size:12px;color:var(--text-muted)">Sắp ra mắt...</small>
+    </div>
+  </div>
+
+  <!-- REPORTS PAGE -->
+  <div class="page" id="page-reports">
+    <div class="empty-state" style="padding-top:60px">
+      <div class="icon">📊</div>
+      Báo cáo tài chính<br><small style="font-size:12px;color:var(--text-muted)">Sắp ra mắt...</small>
+    </div>
+  </div>
+</div>
+
+<!-- FAB -->
+<button class="fab" onclick="openModal()">
+  <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+    <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+  </svg>
+</button>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <button class="nav-item active" id="nav-home" onclick="goPage('home',this)">
+    <div class="nav-pill">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span>Home</span>
+    </div>
+  </button>
+  <button class="nav-item" id="nav-ledger" onclick="goPage('ledger',this)">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+    <span>Ledger</span>
+  </button>
+  <button class="nav-item" id="nav-debt" onclick="goPage('debt',this)">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+    <span>Debt</span>
+  </button>
+  <button class="nav-item" id="nav-reports" onclick="goPage('reports',this)">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+    <span>Reports</span>
+  </button>
+</nav>
+
+<!-- ADD MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeOnOverlay(event)">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <h3>Thêm giao dịch</h3>
+    <div class="action-grid">
+      <button class="action-btn" onclick="closeModal()">
+        <div class="action-btn-icon" style="background:var(--green-bg);color:var(--green)">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </div>
+        <span>Thu nhập</span>
+      </button>
+      <button class="action-btn" onclick="closeModal()">
+        <div class="action-btn-icon" style="background:var(--red-bg);color:var(--red)">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </div>
+        <span>Chi tiêu</span>
+      </button>
+      <button class="action-btn" onclick="closeModal();goPage('debt',document.getElementById('nav-debt'))">
+        <div class="action-btn-icon" style="background:var(--orange-light);color:var(--orange)">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+        <span>Công nợ</span>
+      </button>
+      <button class="action-btn" onclick="closeModal()">
+        <div class="action-btn-icon" style="background:var(--blue-light);color:var(--blue)">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+        </div>
+        <span>Chuyển tiền</span>
+      </button>
+      <button class="action-btn" onclick="closeModal()">
+        <div class="action-btn-icon" style="background:#f3e8ff;color:#9333ea">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+        </div>
+        <span>Tiết kiệm</span>
+      </button>
+      <button class="action-btn" onclick="closeModal()">
+        <div class="action-btn-icon" style="background:#fef9c3;color:#ca8a04">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+        </div>
+        <span>Đầu tư</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== NAV =====
+function goPage(name, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(el => {
+    el.classList.remove('active');
+    const pill = el.querySelector('.nav-pill');
+    if (pill) el.innerHTML = pill.innerHTML;
+  });
+  btn.classList.add('active');
+  btn.innerHTML = `<div class="nav-pill">${btn.innerHTML}</div>`;
+}
+
+// ===== MODAL =====
+function openModal() { document.getElementById('modalOverlay').classList.add('open'); }
+function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); }
+function closeOnOverlay(e) { if (e.target === document.getElementById('modalOverlay')) closeModal(); }
+
+// ===== PROGRESS =====
+window.addEventListener('load', () => {
+  setTimeout(() => { document.getElementById('progressFill').style.width = '85%'; }, 300);
+});
+
+// ===== DEBT MANAGEMENT =====
+const COLORS = ['#6366f1','#10b981','#f97316','#ef4444','#8b5cf6','#06b6d4','#ec4899','#84cc16'];
+let people = []; // { id, name, amount (+ = họ nợ tôi, - = tôi nợ họ), note, color }
+let currentType = 'lend'; // 'lend' | 'owe'
+
+// Preload with the example data from conversation
+people = [
+  { id: 1, name: 'Sếp',  amount: -1243, note: '', color: COLORS[0] },
+  { id: 2, name: 'Bò',   amount: 3025,  note: '', color: COLORS[1] },
+  { id: 3, name: 'Dương',amount: -147,  note: '', color: COLORS[2] },
+  { id: 4, name: 'Chanh',amount: -200,  note: '', color: COLORS[3] },
+];
+let nextId = 5;
+
+function setType(t) {
+  currentType = t;
+  document.getElementById('btnLend').className = 'type-btn' + (t === 'lend' ? ' active-lend' : '');
+  document.getElementById('btnOwe').className  = 'type-btn' + (t === 'owe'  ? ' active-owe'  : '');
+}
+
+function fmt(k) {
+  const abs = Math.abs(k);
+  if (abs >= 1000) return (abs/1000).toFixed(abs%1000===0?0:2).replace(/\.?0+$/,'') + 'M';
+  return abs.toLocaleString('vi-VN') + 'k';
+}
+
+function fmtFull(k) {
+  return Math.abs(k).toLocaleString('vi-VN') + 'k';
+}
+
+function addPerson() {
+  const name = document.getElementById('personName').value.trim();
+  const amt  = parseFloat(document.getElementById('personAmount').value);
+  const note = document.getElementById('personNote').value.trim();
+  if (!name || isNaN(amt) || amt <= 0) {
+    document.getElementById('personName').focus();
+    return;
+  }
+  // check if exists → merge
+  const existing = people.find(p => p.name.toLowerCase() === name.toLowerCase());
+  const signed = currentType === 'lend' ? amt : -amt;
+  if (existing) {
+    existing.amount += signed;
+  } else {
+    people.push({ id: nextId++, name, amount: signed, note, color: COLORS[people.length % COLORS.length] });
+  }
+  document.getElementById('personName').value = '';
+  document.getElementById('personAmount').value = '';
+  document.getElementById('personNote').value = '';
+  render();
+}
+
+function removePerson(id) {
+  people = people.filter(p => p.id !== id);
+  render();
+}
+
+function clearAll() {
+  if (people.length === 0) return;
+  if (confirm('Xóa tất cả công nợ?')) { people = []; render(); }
+}
+
+function render() {
+  // Summary
+  const totalLend = people.filter(p => p.amount > 0).reduce((s,p) => s+p.amount, 0);
+  const totalOwe  = people.filter(p => p.amount < 0).reduce((s,p) => s+Math.abs(p.amount), 0);
+  const net = totalLend - totalOwe;
+
+  document.getElementById('totalLendDisplay').textContent = '+' + fmtFull(totalLend);
+  document.getElementById('totalOweDisplay').textContent  = '-' + fmtFull(totalOwe);
+  document.getElementById('netAmountDisplay').textContent = (net >= 0 ? '+' : '') + fmtFull(net) + 'đ (×1000)';
+  document.getElementById('netLabelDisplay').textContent  = net > 0 ? '✅ Bạn đang được nợ ròng' : net < 0 ? '⚠️ Bạn đang nợ ròng' : '⚖️ Cân bằng hoàn toàn';
+
+  // People list
+  const list = document.getElementById('peopleList');
+  if (people.length === 0) {
+    list.innerHTML = `<div class="empty-state"><div class="icon">🤝</div>Chưa có công nợ nào.<br>Thêm người vào danh sách!</div>`;
+    document.getElementById('settlePlanSection').style.display = 'none';
+    return;
+  }
+
+  list.innerHTML = people.map(p => {
+    const isLend = p.amount >= 0;
+    const color  = isLend ? 'var(--green)' : 'var(--red)';
+    const bgColor= isLend ? 'var(--green-bg)' : 'var(--red-bg)';
+    const sign   = isLend ? '+' : '-';
+    const statusText = isLend
+      ? `<span style="color:var(--green)">📥 Họ nợ bạn ${fmt(p.amount)}</span>`
+      : `<span style="color:var(--red)">📤 Bạn nợ họ ${fmt(p.amount)}</span>`;
+    return `
+    <div class="person-card" style="border-left:4px solid ${p.color}">
+      <div class="person-avatar" style="background:${p.color}">${p.name[0].toUpperCase()}</div>
+      <div class="person-info">
+        <div class="person-name">${p.name}</div>
+        <div class="person-status">${statusText}${p.note ? ' · ' + p.note : ''}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+        <div class="person-amount ${isLend?'lend':'owe'}">${sign}${fmtFull(p.amount)}k</div>
+        <button onclick="removePerson(${p.id})" style="font-size:11px;color:var(--text-muted);background:#f3f4f6;border:none;border-radius:6px;padding:3px 8px;cursor:pointer">Xóa</button>
+      </div>
+    </div>`;
+  }).join('');
+
+  computeSettle();
+}
+
+function computeSettle() {
+  if (people.length === 0) return;
+  document.getElementById('settlePlanSection').style.display = 'block';
+
+  // Build balances: positive = owed to "me", negative = I owe them
+  // For settle plan: treat "me" (Tuấn) as a node too
+  // Creditors: people with positive amount → they give money to me → in terms of flow: I receive
+  // Actually we want minimum transactions to settle all debts
+  // Simplify: net[person] = amount. net[me] = -sum(all amounts)
+  // Find who pays who
+
+  let balances = people.map(p => ({ name: p.name, color: p.color, bal: p.amount }));
+  // me: negative of sum = -(totalLend - totalOwe)
+  const myBal = -people.reduce((s,p) => s+p.amount, 0);
+  if (Math.abs(myBal) > 0.01) {
+    balances.push({ name: 'Tuấn (tôi)', color: '#6366f1', bal: myBal });
+  }
+
+  // Minimum transactions via greedy
+  let transactions = [];
+  let iters = 0;
+  let bals = balances.map(b => ({...b}));
+  while (iters++ < 100) {
+    bals = bals.filter(b => Math.abs(b.bal) > 0.5);
+    if (bals.length === 0) break;
+    bals.sort((a,b) => a.bal - b.bal); // ascending: most negative first
+    const debtor   = bals[0]; // owes most
+    const creditor = bals[bals.length-1]; // owed most
+    if (debtor.bal >= 0 || creditor.bal <= 0) break;
+    const amount = Math.min(Math.abs(debtor.bal), creditor.bal);
+    transactions.push({ from: debtor, to: creditor, amount });
+    debtor.bal   += amount;
+    creditor.bal -= amount;
+  }
+
+  document.getElementById('settleBadge').textContent = transactions.length + ' giao dịch';
+
+  const settleList = document.getElementById('settleList');
+  if (transactions.length === 0) {
+    settleList.innerHTML = '<div style="text-align:center;padding:16px;color:var(--text-muted);font-size:13px">✅ Đã cân bằng!</div>';
+    return;
+  }
+
+  settleList.innerHTML = transactions.map((t, i) => `
+    <div class="settle-row">
+      <div class="settle-avatar-sm" style="background:${t.from.color}">${t.from.name[0]}</div>
+      <div class="settle-arrow">→</div>
+      <div class="settle-avatar-sm" style="background:${t.to.color}">${t.to.name[0]}</div>
+      <div class="settle-info">
+        <div class="settle-desc">${t.from.name} trả ${t.to.name}</div>
+        <div class="settle-amount">${fmtFull(t.amount)}k</div>
+      </div>
+      <button class="settle-done-btn" id="sdone${i}" onclick="markDone(${i})">✓ Xong</button>
+    </div>
+  `).join('');
+}
+
+function markDone(i) {
+  const btn = document.getElementById('sdone'+i);
+  if (btn) { btn.classList.toggle('done'); btn.textContent = btn.classList.contains('done') ? '✅ Đã xong' : '✓ Xong'; }
+}
+
+// Initial render
+render();
+</script>
+</body>
+</html>
