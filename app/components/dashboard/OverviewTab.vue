@@ -26,11 +26,11 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <div class="space-y-5">
+  <div class="space-y-5 w-full">
     <!-- Responsive layout: 1 col on mobile, 3 cols on desktop -->
-    <div class="grid gap-5 lg:grid-cols-3">
+    <div class="grid grid-cols-1 gap-5 lg:grid-cols-3 w-full">
       <!-- Balance and Stats Cards -->
-      <div class="lg:col-span-2 space-y-4">
+      <div class="col-span-1 lg:col-span-2 space-y-4 w-full">
         <!-- Balance banner -->
         <BalanceCard :balance="props.netBalance" :savingsGoalPercent="85" />
         
@@ -44,7 +44,7 @@ const emit = defineEmits<{
       </div>
 
       <!-- Upcoming payments panel -->
-      <div class="lg:col-span-1 bg-white rounded-2xl p-5 shadow border border-gray-100 flex flex-col justify-between h-full">
+      <div class="col-span-1 lg:col-span-1 bg-white rounded-2xl p-5 shadow border border-gray-100 flex flex-col justify-between h-full w-full">
         <UpcomingPayments 
           :payments="props.upcomingPayments" 
           @pay="(id) => emit('payPayment', id)"
@@ -54,7 +54,7 @@ const emit = defineEmits<{
     </div>
 
     <!-- Recent transactions & Optimal settlements -->
-    <div class="grid gap-5 lg:grid-cols-2">
+    <div class="grid grid-cols-1 gap-5 lg:grid-cols-2 w-full">
       <!-- Recent Transactions -->
       <div class="rounded-2xl border border-gray-100 p-5 bg-white shadow-sm space-y-4 text-left">
         <div class="flex items-center justify-between">

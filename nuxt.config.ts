@@ -41,8 +41,33 @@ export default defineNuxtConfig({
   },
   modules: [
     'shadcn-nuxt',
-    '@pinia/nuxt'
+    '@pinia/nuxt',
+    '@vite-pwa/nuxt'
   ],
+  pwa: {
+    manifest: {
+      name: 'Fidrix Quản Lý Tài Chính',
+      short_name: 'Fidrix',
+      description: 'Ứng dụng quản lý tài chính cá nhân đơn giản và hiệu quả',
+      theme_color: '#0f172a',
+      background_color: '#f0f2f5',
+      icons: [
+        {
+          src: '/app_icon.png',
+          sizes: '512x512',
+          type: 'image/png',
+          purpose: 'any maskable'
+        }
+      ]
+    },
+    workbox: {
+      navigateFallback: '/'
+    },
+    devOptions: {
+      enabled: true,
+      type: 'module'
+    }
+  },
   shadcn: {
     /**
      * Prefix for all the imported component.

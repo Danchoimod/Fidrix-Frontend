@@ -31,7 +31,7 @@ const formatValue = (value: number) => {
 </script>
 
 <template>
-  <div class="grid grid-cols-2 gap-2.5">
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 w-full">
     <!-- Income -->
     <div class="bg-white rounded-2xl p-4 shadow">
       <div class="flex items-center justify-between mb-2.5">
