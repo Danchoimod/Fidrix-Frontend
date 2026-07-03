@@ -8,6 +8,11 @@ export default defineNuxtConfig({
   },
   app: {
     head: {
+      meta: [
+        { name: 'theme-color', content: '#f0f2f5' },
+        { name: 'apple-mobile-web-app-capable', content: 'yes' },
+        { name: 'apple-mobile-web-app-status-bar-style', content: 'default' }
+      ],
       link: [
         {
           rel: 'stylesheet',
@@ -49,7 +54,7 @@ export default defineNuxtConfig({
       name: 'Fidrix Quản Lý Tài Chính',
       short_name: 'Fidrix',
       description: 'Ứng dụng quản lý tài chính cá nhân đơn giản và hiệu quả',
-      theme_color: '#0f172a',
+      theme_color: '#f0f2f5',
       background_color: '#f0f2f5',
       start_url: '/',
       display: 'standalone',
