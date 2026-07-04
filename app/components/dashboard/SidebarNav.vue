@@ -27,7 +27,7 @@ const emit = defineEmits<{
       <!-- Home -->
       <button 
         @click="emit('changeTab', 'home')"
-        class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition"
+        class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition cursor-pointer"
         :class="props.activeTab === 'home' ? 'bg-slate-100 text-slate-900 font-bold' : 'text-gray-500 hover:text-slate-900 hover:bg-slate-50'"
       >
         <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -40,7 +40,7 @@ const emit = defineEmits<{
       <!-- Ledger -->
       <button 
         @click="emit('changeTab', 'ledger')"
-        class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition"
+        class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition cursor-pointer"
         :class="props.activeTab === 'ledger' ? 'bg-slate-100 text-slate-900 font-bold' : 'text-gray-500 hover:text-slate-900 hover:bg-slate-50'"
       >
         <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -55,7 +55,7 @@ const emit = defineEmits<{
       <!-- Debt -->
       <button 
         @click="emit('changeTab', 'debt')"
-        class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition"
+        class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition cursor-pointer"
         :class="props.activeTab === 'debt' ? 'bg-slate-100 text-slate-900 font-bold' : 'text-gray-500 hover:text-slate-900 hover:bg-slate-50'"
       >
         <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -68,7 +68,7 @@ const emit = defineEmits<{
       <!-- Reports -->
       <button 
         @click="emit('changeTab', 'reports')"
-        class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition"
+        class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition cursor-pointer"
         :class="props.activeTab === 'reports' ? 'bg-slate-100 text-slate-900 font-bold' : 'text-gray-500 hover:text-slate-900 hover:bg-slate-50'"
       >
         <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -83,7 +83,7 @@ const emit = defineEmits<{
     <div class="p-4 border-t border-slate-100">
       <button 
         @click="emit('logout')"
-        class="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-xs font-bold text-red-500 hover:text-red-600 hover:bg-red-50 transition"
+        class="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-xs font-bold text-red-500 hover:text-red-600 hover:bg-red-50 transition cursor-pointer"
       >
         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
           <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />

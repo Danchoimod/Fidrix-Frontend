@@ -8,25 +8,8 @@ const props = defineProps<{
   dueThisMonth: number
 }>()
 
-const formatCompact = (value: number) => {
-  if (value >= 1e9) {
-    return (value / 1e6).toFixed(1).replace(/\.0$/, '') + 'M' // wait, the mockup had 1.2B for 1.2 Billion, and 800M change
-    // Let's check mockup: Total debt "1.2B" (billion), and "800M" (million) change
-    // Let's implement standard compact formatter:
-  }
-  // Let's check how the mockup handles it:
-  // "1.2B" for 1,200,000,000. "15.2M" for 15,200,000.
-}
-
 const formatValue = (value: number) => {
-  if (value >= 1e9) {
-    return (value / 1e9).toFixed(1).replace(/\.0$/, '') + 'B'
-  } else if (value >= 1e6) {
-    return (value / 1e6).toFixed(1).replace(/\.0$/, '') + 'M'
-  } else if (value >= 1e3) {
-    return (value / 1e3).toFixed(0) + 'K'
-  }
-  return value.toString()
+  return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value)
 }
 </script>
 

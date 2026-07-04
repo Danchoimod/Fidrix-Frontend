@@ -2,7 +2,9 @@
 import { useFinancialStore } from '~/stores/financialStore'
 import LedgerTab from '~/components/dashboard/LedgerTab.vue'
 
-definePageMeta({})
+definePageMeta({
+  layout: 'default'
+})
 
 const financialStore = useFinancialStore()
 

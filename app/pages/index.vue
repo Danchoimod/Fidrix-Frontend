@@ -2,7 +2,9 @@
 import { useFinancialStore } from '~/stores/financialStore'
 import OverviewTab from '~/components/dashboard/OverviewTab.vue'
 
-definePageMeta({})
+definePageMeta({
+  layout: 'default'
+})
 
 const financialStore = useFinancialStore()
 

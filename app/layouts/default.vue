@@ -86,9 +86,9 @@ const handleLogout = () => {
     <!-- ==================================================== -->
     <!-- MOBILE MODE (below md)                               -->
     <!-- ==================================================== -->
-    <div class="block md:hidden max-w-[420px] mx-auto min-h-screen pb-24 relative bg-[#f0f2f5] overflow-x-hidden">
+    <div class="block md:hidden max-w-[420px] mx-auto min-h-screen relative bg-[#f0f2f5] overflow-x-hidden" :class="route.path !== '/notifications' ? 'pb-24' : 'pb-6'">
       <!-- Mobile Header -->
-      <header class="p-[16px_20px_12px] flex items-center justify-between sticky top-0 z-10 bg-[#f0f2f5]/90 backdrop-blur-md">
+      <header v-if="route.path !== '/notifications'" class="p-[16px_20px_12px] flex items-center justify-between sticky top-0 z-10 bg-[#f0f2f5]/90 backdrop-blur-md">
         <div class="flex items-center gap-3">
           <div class="w-11 h-11 rounded-full bg-gradient-to-br from-[#667eea] to-[#764ba2] flex items-center justify-center text-white font-bold text-base">
             T
@@ -107,25 +107,26 @@ const handleLogout = () => {
               <line x1="3" y1="10" x2="21" y2="10" />
             </svg>
           </button>
-          <button class="w-[38px] h-[38px] rounded-xl bg-white flex items-center justify-center shadow active:scale-95 transition relative" @click="handleLogout">
+          <button class="w-[38px] h-[38px] rounded-xl bg-white flex items-center justify-center shadow active:scale-95 transition relative cursor-pointer" @click="navigateTo('/notifications')">
             <svg class="w-[18px] h-[18px] text-[#1a1a2e]" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
-              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-              <polyline points="16 17 21 12 16 7" />
-              <line x1="21" y1="12" x2="9" y2="12" />
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+              <path d="M13.73 21a2 2 0 0 1-3.46 0" />
             </svg>
+            <span class="absolute top-[6px] right-[6px] w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
           </button>
         </div>
       </header>
 
       <!-- Scroll Content -->
-      <div class="px-4 py-2 space-y-4">
+      <div class="px-4 py-2 space-y-4" :class="route.path === '/notifications' ? 'pt-4' : ''">
         <slot />
       </div>
 
       <!-- Mobile FAB -->
       <button 
+        v-if="route.path !== '/notifications'"
         @click="isModalOpen = true"
-        class="fixed bottom-20 right-4 w-[52px] h-[52px] rounded-full bg-[#0f172a] text-white flex items-center justify-center shadow-lg hover:scale-105 active:scale-95 transition z-20"
+        class="fixed bottom-30 right-5 w-[52px] h-[52px] rounded-full bg-[#0f172a] text-white flex items-center justify-center shadow-lg hover:scale-105 active:scale-95 transition z-20"
       >
         <svg class="w-[22px] h-[22px]" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
           <line x1="12" y1="5" x2="12" y2="19" />
@@ -134,7 +135,7 @@ const handleLogout = () => {
       </button>
 
       <!-- Mobile Bottom Navigation -->
-      <BottomNav :active-tab="activeTab" @change-tab="handleTabChange" />
+      <BottomNav v-if="route.path !== '/notifications'" :active-tab="activeTab" @change-tab="handleTabChange" />
     </div>
 
     <!-- Add Transaction Dialog/BottomSheet (Desktop & Mobile shared modal) -->

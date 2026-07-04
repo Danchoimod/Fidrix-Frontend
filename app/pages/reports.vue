@@ -2,7 +2,9 @@
 import { useFinancialStore } from '~/stores/financialStore'
 import ReportTab from '~/components/dashboard/ReportTab.vue'
 
-definePageMeta({})
+definePageMeta({
+  layout: 'default'
+})
 
 const financialStore = useFinancialStore()
 
